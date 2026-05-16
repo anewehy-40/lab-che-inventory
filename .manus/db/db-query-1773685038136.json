@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, openId, name, email, role FROM users WHERE email = 'mada.mado29@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user t869jKPZZM2MBJ1.root --database KRXaH85wcMhcPUe76G3pNQ --execute SELECT id, openId, name, email, role FROM users WHERE email = 'mada.mado29@gmail.com';",
+  "rows": [
+    {
+      "id": "20",
+      "openId": "6DZPnXSdtySAJkB2qNwwCr",
+      "name": "ahmed newehy",
+      "email": "mada.mado29@gmail.com",
+      "role": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\trole\n20\t6DZPnXSdtySAJkB2qNwwCr\tahmed newehy\tmada.mado29@gmail.com\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 1566
+}

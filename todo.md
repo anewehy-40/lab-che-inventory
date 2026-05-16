@@ -1,0 +1,63 @@
+# Lab Chemical Inventory - TODO
+
+- [x] Database schema for chemicals table
+- [x] Seed all 43 chemicals into the database
+- [x] tRPC backend: list, add, update, delete chemicals
+- [x] tRPC backend: AI chat endpoint to auto-fill chemical data
+- [x] Interactive inventory table with all columns
+- [x] Color-coded hazard level system (green/yellow/red)
+- [x] Search and filter across name, formula, category, hazard level
+- [x] Separate views: All, Powders/Solids, Liquids, High Hazard
+- [x] Editable fields: quantity, unit, supplier, lot number, expiry date, location
+- [x] AI chat interface for adding chemicals by name
+- [x] Excel export functionality (CSV format, Excel-compatible)
+- [x] Vitest tests for backend procedures
+- [x] Add scientificUses column to chemicals table
+- [x] Populate all 43 chemicals with scientific/research recommendations
+- [x] Add expandable recommendations panel in the inventory table UI
+- [x] Add delete-by-name via AI chat (detect delete intent, confirm, then delete)
+- [x] Remove Qty, Unit, Supplier, Lot No., Expiry, Location columns from inventory table
+- [x] Protect backend mutations (add, update, delete) with admin-only check
+- [x] Hide edit/delete buttons and AI chat from non-admin users in frontend
+- [x] Auto-generate scientificUses when adding a new chemical via AI chat
+- [x] Backfill scientificUses for all existing chemicals that currently have none
+- [x] Make inventory list publicly accessible without login
+- [x] Show login button only when admin actions are needed
+- [x] Create PWA manifest.json with app name, icons, and theme colors
+- [x] Add service worker for offline caching
+- [x] Register service worker in the app entry point
+- [x] Lab Assistant backend: AI procedure with inventory context and protocol/reference generation
+- [x] Lab Assistant frontend: dedicated chat page with protocol display and inventory cross-check
+- [x] Register /lab-assistant route and add nav item
+- [x] Saved Protocols: database table, save/list/delete procedures
+- [x] Save button in Lab Assistant to bookmark AI responses
+- [x] Saved Protocols panel in Lab Assistant sidebar
+- [x] Dilution Calculator page with step-by-step calculations (C1V1=C2V2, mass-to-solution, percent dilution)
+- [x] Method comparison mode in Lab Assistant (compare two methods via chat)
+- [x] PubChem API integration: fetch chemical data by name/CAS
+- [x] Backend: AI vision procedure to scan chemical label image and extract name, concentration, density, MW
+- [x] Frontend: Camera capture UI with Scan Label button in Dilution Calculator
+- [x] Fix chemicals.test.ts to use admin context for protected procedures (all 13 tests now pass)
+- [x] Create LanguageContext with English/Arabic toggle and RTL support
+- [x] Add Arabic translations file covering all UI strings
+- [x] Apply translations to Sidebar navigation and footer
+- [x] Apply translations to Home inventory page (headers, buttons, filters, badges)
+- [x] Apply translations to Lab Assistant page
+- [x] Apply translations to Dilution Calculator page
+- [x] Apply translations to PubChem Lookup page
+- [x] Add language toggle button (EN/AR) in the sidebar
+- [x] Set document dir="rtl" and font for Arabic text
+- [x] Backend: AI vision endpoint to identify chemical from package/label photo and return full chemical data
+- [x] Frontend: Add "Scan Package" camera UI to AI Add Chemical page
+- [x] Auto-fill chemical fields from photo scan and confirm before adding to inventory
+- [x] Backend: Protocol Generator — AI generates full experiment protocol (steps, reagents, equations, references) with inventory cross-check
+- [x] Backend: Method Comparison — AI compares analytical methods in a structured table (sensitivity, range, interferences, time, cost)
+- [x] Backend: Scientific Writing Assistant — AI drafts Materials & Methods and Results sections from raw data input
+- [x] Backend: PubMed literature search — fetch recent papers from PubMed API by keyword/chemical/method
+- [x] Frontend: New "Research Tools" page with four tabbed panels
+- [x] Frontend: Protocol Generator panel with goal input and formatted protocol output
+- [x] Frontend: Method Comparison panel with comparison table output
+- [x] Frontend: Scientific Writing panel with raw data input and academic text output
+- [x] Frontend: Literature Search panel with PubMed results list
+- [x] Add "Research Tools" nav item to sidebar (EN + AR)
+- [x] Add Arabic translations for all new Research Tools UI strings

@@ -1,0 +1,21 @@
+CREATE TABLE `chemicals` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`formula` varchar(255),
+	`molecularWeight` varchar(64),
+	`category` varchar(128),
+	`hazardLevel` enum('Normal','Hazardous','High Hazard') NOT NULL DEFAULT 'Normal',
+	`ghsCodes` varchar(255),
+	`storageConditions` varchar(255),
+	`physicalState` enum('Powder/Solid','Liquid') NOT NULL DEFAULT 'Powder/Solid',
+	`notes` text,
+	`quantity` varchar(64),
+	`unit` varchar(32),
+	`supplier` varchar(255),
+	`lotNumber` varchar(128),
+	`expiryDate` varchar(32),
+	`location` varchar(255),
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `chemicals_id` PRIMARY KEY(`id`)
+);

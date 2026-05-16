@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `chemicals` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`name` varchar(255) NOT NULL,\n\t`formula` varchar(255),\n\t`molecularWeight` varchar(64),\n\t`category` varchar(128),\n\t`hazardLevel` enum('Normal','Hazardous','High Hazard') NOT NULL DEFAULT 'Normal',\n\t`ghsCodes` varchar(255),\n\t`storageConditions` varchar(255),\n\t`physicalState` enum('Powder/Solid','Liquid') NOT NULL DEFAULT 'Powder/Solid',\n\t`notes` text,\n\t`quantity` varchar(64),\n\t`unit` varchar(32),\n\t`supplier` varchar(255),\n\t`lotNumber` varchar(128),\n\t`expiryDate` varchar(32),\n\t`location` varchar(255),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `chemicals_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user t869jKPZZM2MBJ1.root --database KRXaH85wcMhcPUe76G3pNQ --execute CREATE TABLE `chemicals` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`name` varchar(255) NOT NULL,\n\t`formula` varchar(255),\n\t`molecularWeight` varchar(64),\n\t`category` varchar(128),\n\t`hazardLevel` enum('Normal','Hazardous','High Hazard') NOT NULL DEFAULT 'Normal',\n\t`ghsCodes` varchar(255),\n\t`storageConditions` varchar(255),\n\t`physicalState` enum('Powder/Solid','Liquid') NOT NULL DEFAULT 'Powder/Solid',\n\t`notes` text,\n\t`quantity` varchar(64),\n\t`unit` varchar(32),\n\t`supplier` varchar(255),\n\t`lotNumber` varchar(128),\n\t`expiryDate` varchar(32),\n\t`location` varchar(255),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `chemicals_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1954
+}

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS saved_protocols (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  title VARCHAR(255) NOT NULL,\n  question TEXT NOT NULL,\n  response LONGTEXT NOT NULL,\n  tags VARCHAR(500),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user t869jKPZZM2MBJ1.root --database KRXaH85wcMhcPUe76G3pNQ --execute CREATE TABLE IF NOT EXISTS saved_protocols (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  title VARCHAR(255) NOT NULL,\n  question TEXT NOT NULL,\n  response LONGTEXT NOT NULL,\n  tags VARCHAR(500),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1904
+}
