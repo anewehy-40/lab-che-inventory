@@ -91,6 +91,10 @@ export const translations = {
     untitledProtocol: "Untitled protocol",
     totalDuration: "Total duration",
     allStepsDone: "All steps complete",
+    stepTitlePh: "Step title (optional)",
+    workflowLabel: "Workflow",
+    principleLabel: "Principle / Summary",
+    referenceMethodLabel: "Reference Method",
     // Home page
     chemicalInventory: "Chemical Inventory",
     chemicalsShown: "chemicals shown",
@@ -288,6 +292,10 @@ export const translations = {
     untitledProtocol: "بروتوكول بلا عنوان",
     totalDuration: "المدة الإجمالية",
     allStepsDone: "اكتملت جميع الخطوات",
+    stepTitlePh: "عنوان الخطوة (اختياري)",
+    workflowLabel: "مخطّط العمل",
+    principleLabel: "المبدأ / الملخّص",
+    referenceMethodLabel: "الطريقة المرجعية",
     // Home page
     chemicalInventory: "مخزون المواد الكيميائية",
     chemicalsShown: "مادة معروضة",

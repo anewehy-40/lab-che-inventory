@@ -45,11 +45,22 @@ import {
 
 type Step = {
   id: string;
+  title?: string;
   description: string;
   durationMin?: number | null;
   temperature?: string;
   notes?: string;
 };
+
+// Rotating accent palette so the workflow reads like a graphical abstract.
+const STEP_COLORS = [
+  { badge: "bg-blue-600", bar: "bg-blue-500", soft: "text-blue-700" },
+  { badge: "bg-violet-600", bar: "bg-violet-500", soft: "text-violet-700" },
+  { badge: "bg-emerald-600", bar: "bg-emerald-500", soft: "text-emerald-700" },
+  { badge: "bg-amber-600", bar: "bg-amber-500", soft: "text-amber-700" },
+  { badge: "bg-rose-600", bar: "bg-rose-500", soft: "text-rose-700" },
+  { badge: "bg-cyan-600", bar: "bg-cyan-500", soft: "text-cyan-700" },
+];
 type Reagent = { id: string; name: string; amount: number; unit: string };
 type Citation = { id: string; citation: string; url?: string };
 type ProtocolData = {
@@ -498,7 +509,7 @@ function ProtocolEditor({
           set({
             steps: [
               ...draft.steps,
-              { id: uid(), description: "", durationMin: null, temperature: "", notes: "" },
+              { id: uid(), title: "", description: "", durationMin: null, temperature: "", notes: "" },
             ],
           })
         }
@@ -512,12 +523,12 @@ function ProtocolEditor({
                 {i + 1}
               </span>
               <Input
-                value={step.description}
-                placeholder={t("stepDescriptionPh")}
+                value={step.title ?? ""}
+                placeholder={t("stepTitlePh")}
                 onChange={e =>
                   set({
                     steps: draft.steps.map(s =>
-                      s.id === step.id ? { ...s, description: e.target.value } : s
+                      s.id === step.id ? { ...s, title: e.target.value } : s
                     ),
                   })
                 }
@@ -532,6 +543,18 @@ function ProtocolEditor({
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
+            <Input
+              value={step.description}
+              placeholder={t("stepDescriptionPh")}
+              onChange={e =>
+                set({
+                  steps: draft.steps.map(s =>
+                    s.id === step.id ? { ...s, description: e.target.value } : s
+                  ),
+                })
+              }
+              className="mt-2"
+            />
             <div className={`mt-2 flex flex-wrap gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
               <Input
                 type="number"
@@ -851,18 +874,22 @@ function ProtocolDetail({
       </div>
 
       {protocol.description && (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-          {protocol.description}
-        </p>
+        <section className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+          <h3 className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary ${isRTL ? "flex-row-reverse" : ""}`}>
+            <FlaskConical className="h-4 w-4" />
+            {t("principleLabel")}
+          </h3>
+          <p className="mt-1.5 text-sm text-foreground">{protocol.description}</p>
+        </section>
       )}
 
-      {/* Steps */}
+      {/* Graphical workflow */}
       {protocol.steps.length > 0 && (
-        <section className="rounded-xl border bg-card p-4">
+        <section>
           <div className={`mb-3 flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}>
-            <h3 className={`flex items-center gap-2 text-sm font-semibold text-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
-              <ClipboardList className="h-4 w-4 text-muted-foreground" />
-              {t("stepsLabel")}
+            <h3 className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
+              <ClipboardList className="h-4 w-4" />
+              {t("workflowLabel")}
             </h3>
             {totalMin > 0 && (
               <span className="text-xs text-muted-foreground">
@@ -870,36 +897,59 @@ function ProtocolDetail({
               </span>
             )}
           </div>
-          <ol className="space-y-2.5">
-            {protocol.steps.map((step, i) => (
-              <li
-                key={step.id}
-                className={`flex gap-3 ${isRTL ? "flex-row-reverse" : ""}`}
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {i + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-foreground">{step.description}</p>
-                  <div className={`mt-0.5 flex flex-wrap gap-3 text-xs text-muted-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
-                    {step.durationMin ? (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {step.durationMin} {t("minShort")}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {protocol.steps.map((step, i) => {
+              const color = STEP_COLORS[i % STEP_COLORS.length];
+              return (
+                <div
+                  key={step.id}
+                  className="overflow-hidden rounded-xl border bg-card"
+                >
+                  <div className={`h-1.5 w-full ${color.bar}`} />
+                  <div className="p-4">
+                    <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                      <span
+                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${color.badge}`}
+                      >
+                        {i + 1}
                       </span>
-                    ) : null}
-                    {step.temperature ? (
-                      <span className="flex items-center gap-1">
-                        <Thermometer className="h-3 w-3" />
-                        {step.temperature}
-                      </span>
-                    ) : null}
-                    {step.notes ? <span>· {step.notes}</span> : null}
+                      <h4
+                        className={`text-xs font-bold uppercase tracking-wide ${
+                          step.title ? color.soft : "text-muted-foreground"
+                        }`}
+                      >
+                        {step.title || `${t("stepWord")} ${i + 1}`}
+                      </h4>
+                    </div>
+                    <p className="mt-2 text-sm text-foreground">
+                      {step.description}
+                    </p>
+                    {(step.durationMin || step.temperature || step.notes) && (
+                      <div className={`mt-2.5 flex flex-wrap gap-1.5 ${isRTL ? "flex-row-reverse" : ""}`}>
+                        {step.durationMin ? (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            {step.durationMin} {t("minShort")}
+                          </span>
+                        ) : null}
+                        {step.temperature ? (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                            <Thermometer className="h-3 w-3" />
+                            {step.temperature}
+                          </span>
+                        ) : null}
+                        {step.notes ? (
+                          <span className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                            {step.notes}
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </li>
-            ))}
-          </ol>
+              );
+            })}
+          </div>
         </section>
       )}
 
@@ -951,7 +1001,7 @@ function ProtocolDetail({
         <section className="rounded-xl border bg-card p-4">
           <h3 className={`mb-2 flex items-center gap-2 text-sm font-semibold text-foreground ${isRTL ? "flex-row-reverse" : ""}`}>
             <BookMarked className="h-4 w-4 text-muted-foreground" />
-            {t("referencesLabel")}
+            {t("referenceMethodLabel")}
           </h3>
           <ul className="space-y-1.5">
             {protocol.citations.map(c => (

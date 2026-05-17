@@ -32,6 +32,7 @@ import {
 // ── Structured protocol shapes (steps / reagents / references stored as JSON) ──
 const protocolStepSchema = z.object({
   id: z.string(),
+  title: z.string().optional(),
   description: z.string(),
   durationMin: z.number().nullable().optional(),
   temperature: z.string().optional(),
