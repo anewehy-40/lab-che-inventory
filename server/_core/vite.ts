@@ -1,26 +1,27 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import { type Server } from "http";
-import { nanoid } from "nanoid";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Dev-only: dynamically imports Vite and the Vite config so neither is
+// loaded (or bundled into the eager startup path) in production.
 export async function setupVite(app: Express, server: Server) {
+  const { createServer: createViteServer } = await import("vite");
+  const { nanoid } = await import("nanoid");
   const { default: viteConfig } = await import("../../vite.config");
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true as const,
-  };
 
   const vite = await createViteServer({
     ...viteConfig,
     configFile: false,
-    server: serverOptions,
+    server: {
+      middlewareMode: true,
+      hmr: { server },
+      allowedHosts: true as const,
+    },
     appType: "custom",
   });
 
@@ -50,6 +51,8 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
+// Production-only static file serving. Serves the built client from
+// dist/public. Does NOT import vite or vite.config.ts.
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
 
