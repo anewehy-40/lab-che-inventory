@@ -44,6 +44,11 @@ export const translations = {
     normal: "Normal",
     hazardous: "Hazardous",
     exportExcel: "Export Excel",
+    importExcel: "Import Excel",
+    importing: "Importing...",
+    importedCount: "chemicals imported",
+    importEmpty: "No valid chemicals found in the file",
+    importFailed: "Import failed — check the file format",
     // Hazard legend
     normalLegend: "Normal — no significant hazard",
     hazardousLegend: "Hazardous — PPE required",
@@ -177,6 +182,11 @@ export const translations = {
     normal: "عادي",
     hazardous: "خطر",
     exportExcel: "تصدير Excel",
+    importExcel: "استيراد Excel",
+    importing: "جارٍ الاستيراد...",
+    importedCount: "مادة تم استيرادها",
+    importEmpty: "لم يتم العثور على مواد صالحة في الملف",
+    importFailed: "فشل الاستيراد — تحقق من صيغة الملف",
     // Hazard legend
     normalLegend: "عادي — لا توجد مخاطر تذكر",
     hazardousLegend: "خطر — يلزم معدات الوقاية",

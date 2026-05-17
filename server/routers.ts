@@ -216,6 +216,46 @@ export const appRouter = router({
       return getChemicalsCount();
     }),
 
+    bulkImport: adminProcedure
+      .input(
+        z.object({
+          chemicals: z
+            .array(
+              z.object({
+                name: z.string().min(1),
+                formula: z.string().optional(),
+                molecularWeight: z.string().optional(),
+                category: z.string().optional(),
+                hazardLevel: z
+                  .enum(["Normal", "Hazardous", "High Hazard"])
+                  .default("Normal"),
+                ghsCodes: z.string().optional(),
+                storageConditions: z.string().optional(),
+                physicalState: z
+                  .enum(["Powder/Solid", "Liquid"])
+                  .default("Powder/Solid"),
+                notes: z.string().optional(),
+                quantity: z.string().optional(),
+                unit: z.string().optional(),
+                supplier: z.string().optional(),
+                lotNumber: z.string().optional(),
+                expiryDate: z.string().optional(),
+                location: z.string().optional(),
+              })
+            )
+            .min(1)
+            .max(2000),
+        })
+      )
+      .mutation(async ({ input }) => {
+        let inserted = 0;
+        for (const chemical of input.chemicals) {
+          await insertChemical(chemical);
+          inserted++;
+        }
+        return { inserted };
+      }),
+
     aiChat: adminProcedure
       .input(z.object({ message: z.string() }))
       .mutation(async ({ input }) => {

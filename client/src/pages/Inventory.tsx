@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
+import * as XLSX from "xlsx";
 import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,12 +19,101 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, Pencil, Trash2, FlaskConical, Download, ChevronDown, ChevronRight, BookOpen } from "lucide-react";
+import { Search, Pencil, Trash2, FlaskConical, Download, Upload, ChevronDown, ChevronRight, BookOpen } from "lucide-react";
 import type { Chemical } from "../../../drizzle/schema";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type View = "all" | "powder" | "liquid" | "highhazard";
+
+type ImportChemical = {
+  name: string;
+  formula?: string;
+  molecularWeight?: string;
+  category?: string;
+  physicalState: "Powder/Solid" | "Liquid";
+  hazardLevel: "Normal" | "Hazardous" | "High Hazard";
+  ghsCodes?: string;
+  storageConditions?: string;
+  quantity?: string;
+  unit?: string;
+  supplier?: string;
+  lotNumber?: string;
+  expiryDate?: string;
+  location?: string;
+  notes?: string;
+};
+
+// Flexible column-name matching so imported sheets need not use exact headers.
+const HEADER_ALIASES: Record<string, string[]> = {
+  name: ["chemical name", "name", "chemical", "اسم المادة", "الاسم", "المادة"],
+  formula: ["formula", "الصيغة"],
+  molecularWeight: ["mol. wt. (g/mol)", "mol. wt.", "mol wt", "molecular weight", "mw", "الوزن الجزيئي"],
+  category: ["category", "type", "الفئة", "النوع"],
+  physicalState: ["physical state", "state", "الحالة الفيزيائية", "الحالة"],
+  hazardLevel: ["hazard level", "hazard", "مستوى الخطورة", "الخطورة"],
+  ghsCodes: ["ghs codes", "ghs code", "ghs", "رموز ghs", "رموز"],
+  storageConditions: ["storage conditions", "storage", "ظروف التخزين", "التخزين"],
+  quantity: ["quantity", "qty", "amount", "الكمية"],
+  unit: ["unit", "units", "الوحدة"],
+  supplier: ["supplier", "vendor", "brand", "المورّد", "المورد"],
+  lotNumber: ["lot number", "lot", "batch", "رقم التشغيلة", "رقم اللوط"],
+  expiryDate: ["expiry date", "expiry", "expiration", "exp date", "تاريخ الانتهاء", "تاريخ الصلاحية"],
+  location: ["location", "shelf", "الموقع", "المكان"],
+  notes: ["notes", "note", "remarks", "ملاحظات"],
+};
+
+const normHeader = (s: string) => s.toLowerCase().trim().replace(/\s+/g, " ");
+
+function mapImportRow(row: Record<string, unknown>): ImportChemical | null {
+  const lookup: Record<string, string> = {};
+  for (const [key, value] of Object.entries(row)) {
+    lookup[normHeader(key)] = String(value ?? "").trim();
+  }
+  const get = (field: string): string => {
+    for (const alias of HEADER_ALIASES[field] ?? []) {
+      if (lookup[alias] !== undefined && lookup[alias] !== "") return lookup[alias];
+    }
+    return "";
+  };
+  const opt = (v: string): string | undefined => {
+    const s = v.trim();
+    return s === "" || s === "—" || s === "-" ? undefined : s;
+  };
+
+  const name = get("name");
+  if (!name) return null;
+
+  const ps = get("physicalState").toLowerCase();
+  const physicalState: ImportChemical["physicalState"] =
+    ps.includes("liquid") || ps.includes("سائل") ? "Liquid" : "Powder/Solid";
+
+  const hz = get("hazardLevel").toLowerCase();
+  const hazardLevel: ImportChemical["hazardLevel"] =
+    hz.includes("high") || hz.includes("عالية")
+      ? "High Hazard"
+      : hz.includes("hazard") || hz.includes("خطر")
+      ? "Hazardous"
+      : "Normal";
+
+  return {
+    name,
+    formula: opt(get("formula")),
+    molecularWeight: opt(get("molecularWeight")),
+    category: opt(get("category")),
+    physicalState,
+    hazardLevel,
+    ghsCodes: opt(get("ghsCodes")),
+    storageConditions: opt(get("storageConditions")),
+    quantity: opt(get("quantity")),
+    unit: opt(get("unit")),
+    supplier: opt(get("supplier")),
+    lotNumber: opt(get("lotNumber")),
+    expiryDate: opt(get("expiryDate")),
+    location: opt(get("location")),
+    notes: opt(get("notes")),
+  };
+}
 
 function HazardBadge({ level, t }: { level: string; t: (k: any) => string }) {
   const cls =
@@ -145,6 +235,39 @@ export default function Inventory() {
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const importMutation = trpc.chemicals.bulkImport.useMutation({
+    onSuccess: res => {
+      toast.success(`${res.inserted} ${t("importedCount")}`);
+      refetch();
+    },
+    onError: () => toast.error(t("importFailed")),
+  });
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file) return;
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+        defval: "",
+      });
+      const chemicals = rows
+        .map(mapImportRow)
+        .filter((c): c is ImportChemical => c !== null);
+      if (chemicals.length === 0) {
+        toast.error(t("importEmpty"));
+        return;
+      }
+      importMutation.mutate({ chemicals });
+    } catch {
+      toast.error(t("importFailed"));
+    }
+  };
+
   const counts = useMemo(() => ({
     all: chemicals.length,
     powder: chemicals.filter(c => c.physicalState === "Powder/Solid").length,
@@ -165,10 +288,32 @@ export default function Inventory() {
             {filtered.length} {lang === "ar" ? "من" : "of"} {chemicals.length} {t("chemicalsShown")}
           </p>
         </div>
-        <Button variant="outline" onClick={handleExport} className={`gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-          <Download className="w-4 h-4" />
-          {t("exportExcel")}
-        </Button>
+        <div className={`flex gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+          {isAdmin && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleImportFile}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importMutation.isPending}
+                className={`gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
+              >
+                <Upload className="w-4 h-4" />
+                {importMutation.isPending ? t("importing") : t("importExcel")}
+              </Button>
+            </>
+          )}
+          <Button variant="outline" onClick={handleExport} className={`gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <Download className="w-4 h-4" />
+            {t("exportExcel")}
+          </Button>
+        </div>
       </div>
 
       {/* View tabs */}
