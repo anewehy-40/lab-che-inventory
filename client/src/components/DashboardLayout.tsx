@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { FlaskConical, LogIn, LogOut, PanelLeft, Bot, BookOpen, Calculator, Languages, Microscope } from "lucide-react";
+import { FlaskConical, LogIn, LogOut, PanelLeft, Bot, BookOpen, Calculator, Languages, Microscope, LayoutDashboard } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { LoginDialog } from "@/components/LoginDialog";
 import { useLocation } from "wouter";
@@ -87,7 +87,8 @@ function DashboardLayoutContent({
   const { t, lang, setLang, isRTL } = useLanguage();
 
   const allMenuItems = [
-    { icon: FlaskConical, labelKey: "inventory" as const, path: "/", adminOnly: false },
+    { icon: LayoutDashboard, labelKey: "home" as const, path: "/", adminOnly: false },
+    { icon: FlaskConical, labelKey: "inventory" as const, path: "/inventory", adminOnly: false },
     { icon: BookOpen, labelKey: "labAssistant" as const, path: "/lab-assistant", adminOnly: false },
     { icon: Calculator, labelKey: "dilutionCalculator" as const, path: "/dilution-calculator", adminOnly: false },
     { icon: Microscope, labelKey: "researchTools" as const, path: "/research-tools", adminOnly: false },
