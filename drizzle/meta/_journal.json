@@ -15,6 +15,13 @@
       "when": 1773683693654,
       "tag": "0001_black_nocturne",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1778983514576,
+      "tag": "0002_sudden_chimera",
+      "breakpoints": true
     }
   ]
 }
