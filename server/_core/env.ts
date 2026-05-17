@@ -10,4 +10,5 @@ export const ENV = {
   awsRegion: process.env.AWS_REGION ?? "us-east-1",
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
   openaiBaseUrl: process.env.OPENAI_BASE_URL ?? "https://api.openai.com",
+  llmModel: process.env.LLM_MODEL ?? "gemini-2.5-flash",
 };

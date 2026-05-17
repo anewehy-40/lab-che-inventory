@@ -209,8 +209,15 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  `${ENV.openaiBaseUrl.replace(/\/$/, "")}/v1/chat/completions`;
+const resolveApiUrl = () => {
+  const base = ENV.openaiBaseUrl.replace(/\/+$/, "");
+  // Allow a full completions URL, a provider root, or a versioned/openai path.
+  if (base.endsWith("/chat/completions")) return base;
+  if (base.endsWith("/v1") || base.endsWith("/openai")) {
+    return `${base}/chat/completions`;
+  }
+  return `${base}/v1/chat/completions`;
+};
 
 const assertApiKey = () => {
   if (!ENV.openaiApiKey) {
@@ -278,8 +285,9 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: ENV.llmModel,
     messages: messages.map(normalizeMessage),
+    max_tokens: 8192,
   };
 
   if (tools && tools.length > 0) {
@@ -292,11 +300,6 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   );
   if (normalizedToolChoice) {
     payload.tool_choice = normalizedToolChoice;
-  }
-
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
