@@ -95,6 +95,7 @@ export const translations = {
     workflowLabel: "Workflow",
     principleLabel: "Principle / Summary",
     referenceMethodLabel: "Reference Method",
+    researchIntelligence: "Research Intelligence",
     // Home page
     chemicalInventory: "Chemical Inventory",
     chemicalsShown: "chemicals shown",
@@ -296,6 +297,7 @@ export const translations = {
     workflowLabel: "مخطّط العمل",
     principleLabel: "المبدأ / الملخّص",
     referenceMethodLabel: "الطريقة المرجعية",
+    researchIntelligence: "محرك استخبارات البحث",
     // Home page
     chemicalInventory: "مخزون المواد الكيميائية",
     chemicalsShown: "مادة معروضة",

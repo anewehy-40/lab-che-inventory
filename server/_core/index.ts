@@ -7,6 +7,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { exportRouter } from "../exportRouter";
+import { researchIntelligenceRouter } from "../researchIntelligence";
 
 async function startServer() {
   const app = express();
@@ -22,6 +23,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerAuthRoutes(app);
   app.use("/api/export", exportRouter);
+  app.use("/api/research-intelligence", researchIntelligenceRouter);
   app.use(
     "/api/trpc",
     createExpressMiddleware({
