@@ -60,6 +60,7 @@ researchIntelligenceRouter.post("/", async (req, res) => {
     }
 
     const response = await invokeLLM({
+      max_tokens: 32768,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {

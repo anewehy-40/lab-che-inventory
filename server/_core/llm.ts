@@ -278,6 +278,8 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     tools,
     toolChoice,
     tool_choice,
+    maxTokens,
+    max_tokens,
     outputSchema,
     output_schema,
     responseFormat,
@@ -287,7 +289,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   const payload: Record<string, unknown> = {
     model: ENV.llmModel,
     messages: messages.map(normalizeMessage),
-    max_tokens: 8192,
+    max_tokens: maxTokens ?? max_tokens ?? 8192,
   };
 
   if (tools && tools.length > 0) {
