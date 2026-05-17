@@ -21,6 +21,7 @@ import {
   Calculator,
   Microscope,
   Bot,
+  ClipboardList,
   Package,
   AlertTriangle,
   ShieldAlert,
@@ -114,6 +115,7 @@ export default function Home() {
     adminOnly?: boolean;
   }> = [
     { labelKey: "inventory", descKey: "inventoryDesc", icon: FlaskConical, path: "/inventory", accent: "text-blue-600", iconBg: "bg-blue-50" },
+    { labelKey: "protocolsTitle", descKey: "protocolsDesc", icon: ClipboardList, path: "/protocols", accent: "text-indigo-600", iconBg: "bg-indigo-50" },
     { labelKey: "labAssistant", descKey: "labAssistantDesc", icon: BookOpen, path: "/lab-assistant", accent: "text-violet-600", iconBg: "bg-violet-50" },
     { labelKey: "dilutionCalculator", descKey: "dilutionCalculatorDesc", icon: Calculator, path: "/dilution-calculator", accent: "text-emerald-600", iconBg: "bg-emerald-50" },
     { labelKey: "researchTools", descKey: "researchToolsDesc", icon: Microscope, path: "/research-tools", accent: "text-amber-600", iconBg: "bg-amber-50" },

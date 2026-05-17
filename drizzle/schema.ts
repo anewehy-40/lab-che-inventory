@@ -54,3 +54,35 @@ export const savedProtocols = mysqlTable("saved_protocols", {
 
 export type SavedProtocol = typeof savedProtocols.$inferSelect;
 export type InsertSavedProtocol = typeof savedProtocols.$inferInsert;
+
+// Structured research protocols: steps, reagents and references stored as JSON.
+export const protocols = mysqlTable("protocols", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: varchar("category", { length: 128 }),
+  description: text("description"),
+  steps: longtext("steps"),
+  reagents: longtext("reagents"),
+  citations: longtext("citations"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Protocol = typeof protocols.$inferSelect;
+export type InsertProtocol = typeof protocols.$inferInsert;
+
+// Lab notebook: a record of each time a protocol was executed.
+export const experimentLogs = mysqlTable("experiment_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  protocolId: int("protocolId"),
+  protocolTitle: varchar("protocolTitle", { length: 255 }).notNull(),
+  performedBy: varchar("performedBy", { length: 255 }),
+  sampleCount: int("sampleCount"),
+  outcome: mysqlEnum("outcome", ["success", "partial", "failed"]).default("success").notNull(),
+  notes: text("notes"),
+  runAt: timestamp("runAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ExperimentLog = typeof experimentLogs.$inferSelect;
+export type InsertExperimentLog = typeof experimentLogs.$inferInsert;

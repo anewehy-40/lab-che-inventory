@@ -1,6 +1,6 @@
-import { eq, like, or, and } from "drizzle-orm";
+import { eq, like, or, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, chemicals, InsertChemical, Chemical, savedProtocols, InsertSavedProtocol, SavedProtocol } from "../drizzle/schema";
+import { InsertUser, users, chemicals, InsertChemical, Chemical, savedProtocols, InsertSavedProtocol, SavedProtocol, protocols, InsertProtocol, Protocol, experimentLogs, InsertExperimentLog, ExperimentLog } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -142,4 +142,59 @@ export async function deleteSavedProtocol(id: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(savedProtocols).where(eq(savedProtocols.id, id));
+}
+
+// ── Structured protocols ──────────────────────────────────────────────────────
+
+export async function getAllProtocols(): Promise<Protocol[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(protocols).orderBy(desc(protocols.updatedAt));
+}
+
+export async function getProtocolById(id: number): Promise<Protocol | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(protocols).where(eq(protocols.id, id)).limit(1);
+  return result[0];
+}
+
+export async function insertProtocol(data: InsertProtocol): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(protocols).values(data);
+  return (result[0] as any).insertId as number;
+}
+
+export async function updateProtocol(id: number, data: Partial<InsertProtocol>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(protocols).set(data).where(eq(protocols.id, id));
+}
+
+export async function deleteProtocol(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(protocols).where(eq(protocols.id, id));
+}
+
+// ── Experiment logs (lab notebook) ────────────────────────────────────────────
+
+export async function getAllExperimentLogs(): Promise<ExperimentLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(experimentLogs).orderBy(desc(experimentLogs.runAt));
+}
+
+export async function insertExperimentLog(data: InsertExperimentLog): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(experimentLogs).values(data);
+  return (result[0] as any).insertId as number;
+}
+
+export async function deleteExperimentLog(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(experimentLogs).where(eq(experimentLogs.id, id));
 }

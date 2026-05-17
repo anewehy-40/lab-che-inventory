@@ -11,6 +11,7 @@ import ChatAdd from "./pages/ChatAdd";
 import LabAssistant from "@/pages/LabAssistant";
 import DilutionCalculator from "@/pages/DilutionCalculator";
 import ResearchTools from "@/pages/ResearchTools";
+import Protocols from "@/pages/Protocols";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/inventory" component={Inventory} />
+        <Route path="/protocols" component={Protocols} />
         <Route path="/chat" component={ChatAdd} />
         <Route path="/lab-assistant" component={LabAssistant} />
         <Route path="/dilution-calculator" component={DilutionCalculator} />

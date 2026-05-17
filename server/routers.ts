@@ -5,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
+import type { Protocol } from "../drizzle/schema";
 
 import {
   getAllChemicals,
@@ -18,7 +19,69 @@ import {
   getAllSavedProtocols,
   insertSavedProtocol,
   deleteSavedProtocol,
+  getAllProtocols,
+  getProtocolById,
+  insertProtocol,
+  updateProtocol,
+  deleteProtocol,
+  getAllExperimentLogs,
+  insertExperimentLog,
+  deleteExperimentLog,
 } from "./db";
+
+// ── Structured protocol shapes (steps / reagents / references stored as JSON) ──
+const protocolStepSchema = z.object({
+  id: z.string(),
+  description: z.string(),
+  durationMin: z.number().nullable().optional(),
+  temperature: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+const protocolReagentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  amount: z.number(),
+  unit: z.string(),
+});
+
+const protocolCitationSchema = z.object({
+  id: z.string(),
+  citation: z.string(),
+  url: z.string().optional(),
+});
+
+const protocolInputSchema = z.object({
+  title: z.string().min(1),
+  category: z.string().optional(),
+  description: z.string().optional(),
+  steps: z.array(protocolStepSchema).default([]),
+  reagents: z.array(protocolReagentSchema).default([]),
+  citations: z.array(protocolCitationSchema).default([]),
+});
+
+function deserializeProtocol(row: Protocol) {
+  const parse = (raw: string | null): unknown[] => {
+    if (!raw) return [];
+    try {
+      const value = JSON.parse(raw);
+      return Array.isArray(value) ? value : [];
+    } catch {
+      return [];
+    }
+  };
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    description: row.description,
+    steps: parse(row.steps) as z.infer<typeof protocolStepSchema>[],
+    reagents: parse(row.reagents) as z.infer<typeof protocolReagentSchema>[],
+    citations: parse(row.citations) as z.infer<typeof protocolCitationSchema>[],
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
 
 // Admin-only procedure: must be logged in AND have role="admin"
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -868,6 +931,91 @@ Requirements:
           console.error("[PubMed] Error:", err);
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "PubMed search failed" });
         }
+      }),
+  }),
+
+  researchProtocols: router({
+    list: publicProcedure.query(async () => {
+      const rows = await getAllProtocols();
+      return rows.map(deserializeProtocol);
+    }),
+
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const row = await getProtocolById(input.id);
+        return row ? deserializeProtocol(row) : null;
+      }),
+
+    create: adminProcedure
+      .input(protocolInputSchema)
+      .mutation(async ({ input }) => {
+        const id = await insertProtocol({
+          title: input.title,
+          category: input.category,
+          description: input.description,
+          steps: JSON.stringify(input.steps),
+          reagents: JSON.stringify(input.reagents),
+          citations: JSON.stringify(input.citations),
+        });
+        return { id };
+      }),
+
+    update: adminProcedure
+      .input(z.object({ id: z.number(), data: protocolInputSchema }))
+      .mutation(async ({ input }) => {
+        await updateProtocol(input.id, {
+          title: input.data.title,
+          category: input.data.category,
+          description: input.data.description,
+          steps: JSON.stringify(input.data.steps),
+          reagents: JSON.stringify(input.data.reagents),
+          citations: JSON.stringify(input.data.citations),
+        });
+        return { success: true };
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteProtocol(input.id);
+        return { success: true };
+      }),
+  }),
+
+  experimentLogs: router({
+    list: publicProcedure.query(async () => {
+      return getAllExperimentLogs();
+    }),
+
+    create: adminProcedure
+      .input(
+        z.object({
+          protocolId: z.number().nullable().optional(),
+          protocolTitle: z.string().min(1),
+          performedBy: z.string().optional(),
+          sampleCount: z.number().nullable().optional(),
+          outcome: z.enum(["success", "partial", "failed"]).default("success"),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const id = await insertExperimentLog({
+          protocolId: input.protocolId ?? null,
+          protocolTitle: input.protocolTitle,
+          performedBy: input.performedBy,
+          sampleCount: input.sampleCount ?? null,
+          outcome: input.outcome,
+          notes: input.notes,
+        });
+        return { id };
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteExperimentLog(input.id);
+        return { success: true };
       }),
   }),
 });
